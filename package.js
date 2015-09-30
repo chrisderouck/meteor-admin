@@ -27,8 +27,11 @@ Package.on_use(function(api){
     'meteorhacks:unblock@1.1.0',
     'zimme:active-route@2.0.0',
     'mfactory:admin-lte@0.0.2'
-    ],
+  ],
     both);
+
+  /* Need to declare unordered because of the dependency in tap:i18n-db to ourselve */
+  api.use(["tap:i18n-db@0.4.0"], both, {weak: false, unordered: true})
 
   api.use(['less','session','jquery','templating'],'client')
 

@@ -14,6 +14,7 @@ Meteor.methods
 		if Roles.userIsInRole this.userId, ['admin']
 			Future = Npm.require('fibers/future');
 			fut = new Future();
+			console.log('update the document')
 			adminCollectionObject(collection).update {_id:_id},modifier,(e,r)->
 				fut['return']( {e:e,r:r} )
 			return fut.wait()
@@ -21,12 +22,20 @@ Meteor.methods
 	adminNewTranslationDoc: (modifier,collection,_id)->
 		check arguments, [Match.Any]
 		if Roles.userIsInRole this.userId, ['admin']
-			Future = Npm.require('fibers/future');
-			fut = new Future();
-			#dependency on i18n-db
-			adminCollectionObject(collection).insertTranslations {_id:_id},modifier,(e,r)->
-				fut['return']( {e:e,r:r} )
-			return fut.wait()
+			#Future = Npm.require('fibers/future');
+			#fut = new Future();
+			console.log('Try to insert translation for id: '+ _id)
+			data = modifier['$set']
+			console.log(data)
+			#dependency on i18n-db, current language needs to be set, normally set in onBeforeAction, Can be reset later to default language
+			id = adminCollectionObject(collection).updateTranslations _id, {
+				fr: {
+					data
+				}
+			}#,(e,r)->
+			#adminCollectionObject(collection).translate {_id:_id},modifier,(e,r)->
+				#fut['return']( {e:e,r:r} )
+			#return fut.wait()
 
 	adminRemoveDoc: (collection,_id)->
 		check arguments, [Match.Any]

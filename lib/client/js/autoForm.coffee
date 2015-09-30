@@ -2,6 +2,7 @@
 AutoForm.addHooks [
 		'admin_insert',
 		'admin_update',
+		'admin_translate',
 		'adminNewUser',
 		'adminUpdateUser',
 		'adminSendResetPasswordEmail',
@@ -11,6 +12,7 @@ AutoForm.addHooks [
 	endSubmit: ->
 		$('.btn-primary').removeClass('disabled')
 	onError: (formType, error)->
+		console.log('something went wrong')
 		AdminDashboard.alertFailure error.message
 
 AutoForm.hooks
@@ -30,6 +32,7 @@ AutoForm.hooks
 
 	admin_update:
 		onSubmit: (insertDoc, updateDoc, currentDoc)->
+			console.log('admin_update submit_hook')
 			hook = @
 			Meteor.call 'adminUpdateDoc', updateDoc, Session.get('admin_collection_name'), Session.get('admin_id'), (e,r)->
 				if e
@@ -40,6 +43,27 @@ AutoForm.hooks
 			return false
 		onSuccess: (formType, collection)->
 			AdminDashboard.alertSuccess 'Successfully updated'
+			Router.go "/admin/#{collection}"
+
+	admin_translate:
+		onSubmit: (insertDoc, updateDoc, currentDoc)->
+			console.log('admin_translate submit_hook')
+			hook = @
+			Meteor.call 'adminNewTranslationDoc', updateDoc, Session.get('admin_collection_name'), Session.get('admin_id'), (e,r)->
+				if e
+					console.log('translate meteor method call error')
+					console.log(e)
+					hook.done(e)
+				else
+					console.log('translate meteor method call success')
+					console.log(r)
+					#TODO: Do we need to have an alternative callback here?
+					adminCallback 'onUpdate', [Session.get 'admin_collection_name', insertDoc, updateDoc, currentDoc], (collection) ->
+						hook.done null, collection
+			return false
+		onSuccess: (formType, collection)->
+			AdminDashboard.alertSuccess 'Successfully translated (' + Session.get('language_code') + ')'
+			TAPi18n.setLanguage('en')
 			Router.go "/admin/#{collection}"
 
 	adminNewUser:

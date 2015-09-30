@@ -122,8 +122,7 @@ adminCreateRoutes = (collections, languages) ->
 	_.each collections, adminCreateRouteView
 	_.each collections,	adminCreateRouteNew
 	_.each collections, adminCreateRouteEdit
-	_.each languages, (language)->
-		_.each collections, adminCreateRouteTranslate, {code: language}
+	_.each collections, adminCreateRouteTranslate
 
 adminCreateRouteView = (collection, collectionName) ->
 	Router.route "adminDashboard#{collectionName}View",
@@ -173,10 +172,9 @@ adminCreateRouteEdit = (collection, collectionName) ->
 		data: ->
 			admin_collection: adminCollectionObject collectionName
 
-adminCreateRouteTranslate = (collection, collectionName, languageCode) ->
-	#console.log('collection info'+ collection)
-	Router.route "adminDashboard#{collectionName}Translate#{this.code}",
-		path: "/admin/#{collectionName}/:_id/translate/#{this.code}"
+adminCreateRouteTranslate = (collection, collectionName) ->
+	Router.route "adminDashboard#{collectionName}Translate",
+		path: "/admin/#{collectionName}/:_id/translate/:language_code"
 		template: "AdminDashboardTranslate"
 		controller: "AdminController"
 		waitOn: ->
@@ -185,11 +183,16 @@ adminCreateRouteTranslate = (collection, collectionName, languageCode) ->
 			@render()
 		onAfterAction: ->
 			Session.set 'admin_title', AdminDashboard.collectionLabel collectionName
-			Session.set 'admin_subtitle', 'Translate ' + @params._id
-			Session.set 'admin_collection_page', "translate (#{this.code})"
+			Session.set 'admin_subtitle', 'Translate to ' + @params.language_code + " " + @params._id
+			Session.set 'admin_collection_page', "translate (" + @params.language_code + ")"
 			Session.set 'admin_collection_name', collectionName
 			Session.set 'admin_id', parseID(@params._id)
 			Session.set 'admin_doc', adminCollectionObject(collectionName).findOne _id : parseID(@params._id)
+			Session.set 'language_code', @params.language_code
+		onBeforeAction: ->
+			console.log("onbeforeaction translate page, language is set to #{@params.language_code}")
+			TAPi18n.setLanguage(@params.language_code)
+			this.next()
 		data: ->
 			admin_collection: adminCollectionObject collectionName
 

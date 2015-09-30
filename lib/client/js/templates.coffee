@@ -56,7 +56,7 @@ Template.adminEditBtn.helpers
 
 Template.adminTranslateBtn.helpers
 	path: (language, id)->
-		Router.path "adminDashboard" + Session.get('admin_collection_name') + "Translate" + language, _id: id
+		Router.path "adminDashboard" + Session.get('admin_collection_name') + "Translate", _id: id, language_code: language
 	languages: ->
 		ori = TAPi18n.getLanguages()
 		languages = Object.keys(ori).map (k) ->
@@ -65,11 +65,9 @@ Template.adminTranslateBtn.helpers
 			item
 		languages
 
-# Note, you would expect the template of the translate button, however this gets rendered in another template,
+# Note, you would expect adminTranslateBtn (the template of the translate button), however this gets rendered in another template,
 # thus this is the one we should target to attach events
 Template.AdminDashboardViewWrapper.events
 	"change select.translateButtons": (event, template) ->
-		console.log('changed')
 		translatePath = event.currentTarget.value
-		console.log('path: ' + translatePath)
 		Router.go(translatePath)
