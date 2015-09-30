@@ -10,6 +10,14 @@ adminEditButton = {
 	width: '40px'
 	orderable: false
 }
+adminTranslateButton = {
+	data: '_id'
+	title: 'Translate'
+	createdCell: (node, cellData, rowData) ->
+		$(node).html(Blaze.toHTMLWithData Template.adminTranslateBtn, {_id: cellData}, node)
+	width: '40px'
+	orderable: false
+}
 adminDelButton = {
 	data: '_id'
 	title: 'Delete'
@@ -77,6 +85,7 @@ adminCreateTables = (collections) ->
 	_.each AdminConfig?.collections, (collection, name) ->
 		_.defaults collection, {
 			showEditColumn: true
+			showTranslateColumn: true
 			showDelColumn: true
 		}
 
@@ -95,6 +104,8 @@ adminCreateTables = (collections) ->
 
 		if collection.showEditColumn
 			columns.push(adminEditButton)
+		if collection.showTranslateColumn
+			columns.push(adminTranslateButton)
 		if collection.showDelColumn
 			columns.push(adminDelButton)
 
@@ -107,10 +118,12 @@ adminCreateTables = (collections) ->
 			extraFields: collection.extraFields
 			dom: adminTablesDom
 
-adminCreateRoutes = (collections) ->
+adminCreateRoutes = (collections, languages) ->
 	_.each collections, adminCreateRouteView
 	_.each collections,	adminCreateRouteNew
 	_.each collections, adminCreateRouteEdit
+	_.each languages, (language)->
+		_.each collections, adminCreateRouteTranslate, {code: language}
 
 adminCreateRouteView = (collection, collectionName) ->
 	Router.route "adminDashboard#{collectionName}View",
@@ -160,6 +173,27 @@ adminCreateRouteEdit = (collection, collectionName) ->
 		data: ->
 			admin_collection: adminCollectionObject collectionName
 
+adminCreateRouteTranslate = (collection, collectionName, languageCode) ->
+	#console.log('collection info'+ collection)
+	Router.route "adminDashboard#{collectionName}Translate#{this.code}",
+		path: "/admin/#{collectionName}/:_id/translate/#{this.code}"
+		template: "AdminDashboardTranslate"
+		controller: "AdminController"
+		waitOn: ->
+			Meteor.subscribe 'adminCollectionDoc', collectionName, parseID(@params._id)
+		action: ->
+			@render()
+		onAfterAction: ->
+			Session.set 'admin_title', AdminDashboard.collectionLabel collectionName
+			Session.set 'admin_subtitle', 'Translate ' + @params._id
+			Session.set 'admin_collection_page', "translate (#{this.code})"
+			Session.set 'admin_collection_name', collectionName
+			Session.set 'admin_id', parseID(@params._id)
+			Session.set 'admin_doc', adminCollectionObject(collectionName).findOne _id : parseID(@params._id)
+		data: ->
+			admin_collection: adminCollectionObject collectionName
+
+
 adminPublishTables = (collections) ->
 	_.each collections, (collection, name) ->
 		if not collection.children then return undefined
@@ -183,5 +217,5 @@ adminPublishTables = (collections) ->
 
 Meteor.startup ->
 	adminCreateTables AdminConfig?.collections
-	adminCreateRoutes AdminConfig?.collections
+	adminCreateRoutes AdminConfig?.collections, Object.keys(TAPi18n.getLanguages())
 	adminPublishTables AdminConfig?.collections if Meteor.isServer

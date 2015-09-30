@@ -18,6 +18,16 @@ Meteor.methods
 				fut['return']( {e:e,r:r} )
 			return fut.wait()
 
+	adminNewTranslationDoc: (modifier,collection,_id)->
+		check arguments, [Match.Any]
+		if Roles.userIsInRole this.userId, ['admin']
+			Future = Npm.require('fibers/future');
+			fut = new Future();
+			#dependency on i18n-db
+			adminCollectionObject(collection).insertTranslations {_id:_id},modifier,(e,r)->
+				fut['return']( {e:e,r:r} )
+			return fut.wait()
+
 	adminRemoveDoc: (collection,_id)->
 		check arguments, [Match.Any]
 		if Roles.userIsInRole this.userId, ['admin']
