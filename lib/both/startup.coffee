@@ -159,7 +159,7 @@ adminCreateRouteEdit = (collection, collectionName) ->
 		template: "AdminDashboardEdit"
 		controller: "AdminController"
 		waitOn: ->
-			Meteor.subscribe 'adminCollectionDoc', collectionName, parseID(@params._id)
+			TAPi18n.subscribe 'adminCollectionDoc', collectionName, parseID(@params._id)
 		action: ->
 			@render()
 		onAfterAction: ->
@@ -178,7 +178,7 @@ adminCreateRouteTranslate = (collection, collectionName) ->
 		template: "AdminDashboardTranslate"
 		controller: "AdminController"
 		waitOn: ->
-			Meteor.subscribe 'adminCollectionDoc', collectionName, parseID(@params._id)
+			TAPi18n.subscribe 'adminCollectionDoc', collectionName, parseID(@params._id)
 		action: ->
 			@render()
 		onAfterAction: ->

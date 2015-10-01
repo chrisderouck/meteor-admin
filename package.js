@@ -31,7 +31,7 @@ Package.on_use(function(api){
     both);
 
   /* Need to declare unordered because of the dependency in tap:i18n-db to ourselve */
-  api.use(["tap:i18n-db@0.4.0"], both, {weak: false, unordered: true})
+  api.use(["tap:i18n-db@0.4.0"], both); //, {weak: false, unordered: true})
 
   api.use(['less','session','jquery','templating'],'client')
 

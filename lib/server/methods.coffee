@@ -28,14 +28,9 @@ Meteor.methods
 			data = modifier['$set']
 			console.log(data)
 			#dependency on i18n-db, current language needs to be set, normally set in onBeforeAction, Can be reset later to default language
-			id = adminCollectionObject(collection).updateTranslations _id, {
-				fr: {
+			id = adminCollectionObject(collection).updateTranslations _id,
+				fr:
 					data
-				}
-			}#,(e,r)->
-			#adminCollectionObject(collection).translate {_id:_id},modifier,(e,r)->
-				#fut['return']( {e:e,r:r} )
-			#return fut.wait()
 
 	adminRemoveDoc: (collection,_id)->
 		check arguments, [Match.Any]
