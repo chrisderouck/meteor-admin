@@ -15,7 +15,6 @@ Meteor.methods
 		if Roles.userIsInRole this.userId, ['admin']
 			Future = Npm.require('fibers/future');
 			fut = new Future();
-			console.log('update the document')
 			adminCollectionObject(collection).update {_id:_id},modifier,(e,r)->
 				fut['return']( {e:e,r:r} )
 			return fut.wait()
@@ -25,7 +24,6 @@ Meteor.methods
 		if Roles.userIsInRole this.userId, ['admin']
 			Future = Npm.require('fibers/future');
 			fut = new Future();
-			console.log('Try to insert translation for id: '+ _id)
 			data = {}
 			data[language_code] = modifier['$set']
 			# dependency on i18n-db
