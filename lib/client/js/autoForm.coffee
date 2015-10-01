@@ -49,14 +49,13 @@ AutoForm.hooks
 		onSubmit: (insertDoc, updateDoc, currentDoc)->
 			console.log('admin_translate submit_hook')
 			hook = @
-			Meteor.call 'adminNewTranslationDoc', updateDoc, Session.get('admin_collection_name'), Session.get('admin_id'), (e,r)->
+			Meteor.call 'adminNewTranslationDoc', updateDoc, Session.get('admin_collection_name'), Session.get('admin_id'), Session.get('language_code'), (e,r)->
 				if e
-					console.log('translate meteor method call error')
-					console.log(e)
+					console.log('translate meteor method call error: ' + e)
 					hook.done(e)
 				else
-					console.log('translate meteor method call success')
-					console.log(r)
+					console.log('translate meteor method call success: ' )
+
 					#TODO: Do we need to have an alternative callback here?
 					adminCallback 'onUpdate', [Session.get 'admin_collection_name', insertDoc, updateDoc, currentDoc], (collection) ->
 						hook.done null, collection

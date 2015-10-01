@@ -5,6 +5,7 @@ Meteor.methods
 			Future = Npm.require('fibers/future');
 			fut = new Future();
 
+			# TODO: Should we use insertTranslation if we have translations enabled?
 			adminCollectionObject(collection).insert doc, (e,_id)->
 				fut['return']( {e:e,_id:_id} )
 			return fut.wait()
@@ -19,18 +20,18 @@ Meteor.methods
 				fut['return']( {e:e,r:r} )
 			return fut.wait()
 
-	adminNewTranslationDoc: (modifier,collection,_id)->
+	adminNewTranslationDoc: (modifier,collection,_id, language_code)->
 		check arguments, [Match.Any]
 		if Roles.userIsInRole this.userId, ['admin']
-			#Future = Npm.require('fibers/future');
-			#fut = new Future();
+			Future = Npm.require('fibers/future');
+			fut = new Future();
 			console.log('Try to insert translation for id: '+ _id)
-			data = modifier['$set']
-			console.log(data)
-			#dependency on i18n-db, current language needs to be set, normally set in onBeforeAction, Can be reset later to default language
-			id = adminCollectionObject(collection).updateTranslations _id,
-				fr:
-					data
+			data = {}
+			data[language_code] = modifier['$set']
+			# dependency on i18n-db
+			adminCollectionObject(collection).updateTranslations _id, data,(e,r)->
+				fut['return']( {e:e,r:r} )
+			return fut.wait()
 
 	adminRemoveDoc: (collection,_id)->
 		check arguments, [Match.Any]
